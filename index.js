@@ -17,8 +17,14 @@ const checkParity = (number) => {
 }
 
 const fetchFunFact = async (number) => {
-    const response = await axios.get(`http://numbersapi.com/${number}/math`);
-    return response.data;
+
+    try {
+
+        const response = await axios.get(`http://numbersapi.com/${number}/math`);
+        return response.data;
+    } catch (e) {
+        // return response.data;
+    }
 }
 
 const getDigitSum = (number) => {
@@ -35,7 +41,7 @@ const getDigitSum = (number) => {
         }
     }
 
-    return isNegative + sum;
+    return Number(isNegative + sum);
 }
 
 const checkIsPrime = (number) => {
@@ -89,7 +95,7 @@ const checkIsArmstrong = (number) => {
         sum += Number(x)**numLength;
     }
 
-    if ( sum === number ) {
+    if ( sum === Number(number) ) {
         isArmstrong = true;
     }
 
@@ -97,26 +103,26 @@ const checkIsArmstrong = (number) => {
 
 }
 
-const properties = [];
 
 app.get("/api/classify-number", async (req, res) => {
+    
+    const properties = [];
     const requestNumber = Number(req.query.number);
 
     const isInteger = Number.isInteger(requestNumber);
+    checkIsArmstrong(req.query.number) ? properties.includes("armstrong") ? null : properties.push("armstrong") : null
+    properties.includes(checkParity(requestNumber)) ? null : properties.push(checkParity(requestNumber));
 
-    properties.push(checkParity(requestNumber));
-
-    const fun_fact = await fetchFunFact(requestNumber);
-
+    
     const digit_sum = getDigitSum(req.query.number);
-
+    
     const is_prime = checkIsPrime(requestNumber);
-
+    
     const is_perfect = checkIsPerfect(requestNumber);
-
-    const is_armstrong = checkIsArmstrong(req.query.number);
-
+    
+    
     try {
+        const fun_fact = await fetchFunFact(requestNumber);
 
         if (isInteger) {
 
@@ -124,10 +130,11 @@ app.get("/api/classify-number", async (req, res) => {
                 number: requestNumber,
                 is_prime,
                 is_perfect,
-                is_armstrong,
+                // is_armstrong,
                 properties,
-                fun_fact,
-                digit_sum
+                digit_sum,
+                fun_fact
+
             });
         } else {
     
